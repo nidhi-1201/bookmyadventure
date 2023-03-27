@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <div class="row mt-5 mb-5">
+      <div class="col-md-8">
+         <h2 class="heading-tertiary">Your Booking is Successful</h2>
+          <h3 class="heading-tertiary mt-5">Booking Details</h3>
+          <table class= "table mt-5 mb-5">
+                <thead class="thead-dark">
+                    <tr class= "tr">
+                        <th class = "th">Activity Name</th>
+                        <th class = "th">Date of Activity</th>
+                        <th class = "th">Date of Booking</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="tr">
+                        <td class = "td">{{reservation.activity_allocated}}</td>
+                        <td class = "td">{{reservation.date}}</td>
+                        <td class = "td">{{reservation.booktime}}</td>
+                    </tr>
+                </tbody>
+            </table>
+      </div>
+        <div class="col-md-4 d-flex align-items-center justify-content-center">
+            <div class="book book__form p-5">
+                <h2 class="login--title">USER INFO</h2>
+                <p class="text-white profile--info--details mt-5">Username: {{user.username}}</p>
+                <p class="text-white profile--info--details mt-3">Name: {{user.first_name}}  {{user.last_name}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
