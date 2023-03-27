@@ -190,3 +190,47 @@ def activitydetails(request, id):  # request variable takes a GET or POST HTTP r
     else:
         messages.warning(request, 'you are not logged in or have no access')
         return redirect('login')
+
+
+# Function for displaying all user reserved activities
+def my_bookings(request):  # request variable takes a GET or POST HTTP request
+    user = request.user
+    if user.username and user.is_staff is False and user.is_superuser is False:
+        T = Reservation.objects.filter(user_booked=user).order_by('-booktime').filter(status=True)
+        bookings = []
+
+        for t in T:
+            r = t.activity_allocated
+            bookings.append({'T': t, 'R': r})
+        context = {'bookings': bookings, 'reservation': T}
+        return render(request, 'booking/my_bookings.html', context)
+    else:
+        messages.warning(request, 'You are not authorized to access the requested page. Please Login ')
+        return redirect('home')
+
+
+def feedback(request):  # request variable takes a GET or POST HTTP request
+    user = request.user
+    if user.username and user.is_staff is False and user.is_superuser is False:
+        if request.method == 'POST':
+            form = FeedbackForm(request.POST)
+            if form.is_valid():
+                feed = form.cleaned_data.get('feed')
+
+                newfeedback = Feedback()
+                newfeedback.user_of = user
+                newfeedback.time = datetime.date.today()
+                newfeedback.feed = feed
+                newfeedback.feedbackID = str(user.username) + str(datetime.date.today()) + str(user.email)
+                newfeedback.save()
+
+                return render(request, "booking/feedback_successful.html")
+            else:
+                messages.error(request, "Invalid form details")
+
+        form = FeedbackForm()
+        return render(request, "booking/feedback.html", context={"form": form})
+
+    else:
+        messages.warning(request, 'You are not logged in. Please login')
+        redirect('home')
