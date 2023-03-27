@@ -153,3 +153,40 @@ def cancel(request, id):  # request variable takes a GET or POST HTTP request
     else:
         messages.warning(request, 'you are not logged in or have no access')
         return redirect('login')
+
+
+def book(request, date):  # request variable takes a GET or POST HTTP request
+    user = request.user
+    if user.username and user.is_staff is False and user.is_superuser is False:
+        if request.method == 'POST':
+            return redirect('index')
+        else:
+            try:
+                T = PreReservation.objects.filter(date=date)
+            except PreReservation.DoesNotExist:
+                T = PreReservation.objects.create(date=date)
+
+            if not T:
+                activity_available = activity.objects.all()
+                for a in activity_available:
+                    a.prereservation_set.create(date=date)
+
+            activities = PreReservation.objects.filter(date=date)
+        return render(request, 'booking/available.html', {'activities': activities})
+    else:
+        messages.warning(request, 'You are not logged in. Please login')
+        redirect('home')
+
+
+def activitydetails(request, id):  # request variable takes a GET or POST HTTP request
+    user = request.user
+    if user.username and user.is_staff is False and user.is_superuser is False:
+        if request.method == 'POST':
+            a = activity.objects.get(pk = id)
+            return render(request, "booking/activitydetails.html", {'activity': a})
+        else:
+            messages.warning(request, 'something went wrong')
+            return redirect('index')
+    else:
+        messages.warning(request, 'you are not logged in or have no access')
+        return redirect('login')

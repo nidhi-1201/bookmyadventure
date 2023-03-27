@@ -13,4 +13,6 @@ urlpatterns = [
     path('password_change/done/', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done'),
     path('profile/', views.index.as_view(), name='index'),
     path('cancel/<int:id>/', views.cancel, name='cancel'),
+    path('book/<str:date>', views.book, name='book'),
+    path('activitydetails/<int:id>/', views.activitydetails, name='activitydetails'),
 ]
