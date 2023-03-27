@@ -234,3 +234,34 @@ def feedback(request):  # request variable takes a GET or POST HTTP request
     else:
         messages.warning(request, 'You are not logged in. Please login')
         redirect('home')
+
+def bookform(request, r, T):
+    user = request.user
+    if user.username and user.is_staff is False and user.is_superuser is False:
+        a = activity.objects.get(id = r)
+        if request.method == 'POST':
+            t = PreReservation.objects.get(id=T)
+
+            newreservation = Reservation()
+            newreservation.bookingID = str(a.activityId) + str(user.username) + str(datetime.date.today())
+            newreservation.date = t.date
+            newreservation.user_booked = user
+            newreservation.booktime = datetime.date.today()
+            newreservation.status = True
+            newreservation.attraction_type = a.attraction_type
+            newreservation.activity_allocated = a
+            newreservation.save()
+            t.seats = t.seats - 1
+            t.save()
+
+            return render(request, "booking/book_successful.html", {'reservation': newreservation})
+        else:
+            t = PreReservation.objects.get(id = T)
+            activities = PreReservation.objects.filter(date=t.date)
+            return render(request, 'booking/available.html', {'activities': activities})
+    else:
+        messages.warning(request, 'You are not logged in. Please login')
+        return redirect('home')
+
+def about(request):
+    return render(request=request, template_name="user/about.html")
