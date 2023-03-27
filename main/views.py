@@ -5,28 +5,24 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.db.models import Q
+from django.contrib.auth.forms import AuthenticationForm
 
-from django.db.models import Count
+from django.views import View
+
 from .forms import *
 from .models import *
-import datetime
 
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
 
 from django.contrib.auth.models import Group
 
 
-# The major backend logic for online guest house booking system
-
 # Function to display the Homepage of the web system
-def home(request):
-    return render(request=request, template_name="user/home.html")
+class home(View):
+    def get(self, request):
+        return render(request=request, template_name="user/home.html")
 
 
-# Function to Sign up new user
+
 def sign_up(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
@@ -36,7 +32,6 @@ def sign_up(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            messages.info(request, "Welcome to KGP")
             return redirect('index')
         else:
             messages.error(request, "Invalid Form Details")
@@ -45,7 +40,7 @@ def sign_up(request):
     return render(request, 'user/sign-up.html', {'form': form})
 
 
-# Fuction to edit User details
+# Function for editing user details
 def edit_user(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -75,7 +70,7 @@ def edit_user(request):
     return render(request, 'user/user-edit.html', {'form': form})
 
 
-# Function to Login in a new user
+# Function for signing user in
 def login_request(request):  # request variable takes a GET or POST HTTP request
     if request.method == 'POST':
         form = AuthenticationForm(request=request, data=request.POST)
@@ -89,7 +84,6 @@ def login_request(request):  # request variable takes a GET or POST HTTP request
                 return redirect('login')
 
             if user is not None:
-                # Checking if a user if a staff
                 if user.is_staff and not user.groups.filter(name='Staff').exists():
                     group = Group.objects.get(name='Staff')
                     user.groups.add(group)
@@ -104,29 +98,8 @@ def login_request(request):  # request variable takes a GET or POST HTTP request
     return render(request, "user/login.html", context={"form": form})
 
 
-# Function to logout the user
+# Function for logouut
 def logout_request(request):  # request variable takes a GET or POST HTTP request
     logout(request)
     messages.info(request, "Logged out successfully!")
     return redirect('home')
-
-
-# Function to change the password of the user
-def change_password(request):  # request variable takes a GET or POST HTTP request
-    user = request.user
-    if user.username and user.is_staff is False and user.is_superuser is False:
-        if request.method == 'POST':
-            form = PasswordChangeForm(request.user, request.POST)
-            if form.is_valid():  # here user details are verified from database
-                user = form.save()
-                update_session_auth_hash(request.user)
-                messages.success(request, 'Your password was successfully updated!')
-                return redirect('change_password')
-            else:
-                messages.error(request, 'Please correct the error below:')
-        else:
-            form = PasswordChangeForm(request.user)
-        return render(request, 'user/change_password.html', {'form': form})
-    else:
-        messages.warning(request, 'You are not logged in. Please login')
-        return redirect('home')
