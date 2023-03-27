@@ -58,3 +58,10 @@ class UserEditForm(forms.Form):
 
 class DateInput(forms.DateInput):
     input_type = 'date'
+
+
+class ReservationForm(forms.Form):
+    date = forms.DateField(widget=forms.widgets.DateInput(
+        attrs={'type': 'date',
+        "class": "form__input",
+        }), required=True,)

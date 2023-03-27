@@ -14,6 +14,7 @@ class activity(models.Model):
     attraction_type = models.CharField(max_length=20, choices=ATTRACTION_TYPE, null=False)
     price = models.PositiveIntegerField(default=None, blank=False, null=False)
 
+
     class Meta:
         verbose_name_plural = 'Activity'
         ordering = ['activityId']
@@ -24,14 +25,11 @@ class activity(models.Model):
 
 class Reservation(models.Model):
     bookingID = models.CharField(default=None, max_length=30)
-    start_date = models.DateTimeField(default=None, null=True)
-    end_date = models.DateTimeField(default=None, null=True)
+    date = models.DateTimeField(default=None, null=True)
 
     user_booked = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=False, blank=False)
-    # no_rooms = models.IntegerField(    null=True, blank=True)
     activity_allocated = models.ForeignKey(activity, on_delete=models.CASCADE, null=True, blank=True)
     status = models.BooleanField(default=False)
-    waiting = models.BooleanField(default=False)
     ATTRACTION_TYPE = [
         ('1', 'Low'),
         ('2', 'Medium'),
@@ -49,9 +47,7 @@ class Reservation(models.Model):
 
 
 class PreReservation(models.Model):
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
-    # no_rooms = models.IntegerField(null=True, blank=True)
+    date = models.DateField(null=True, blank=True)
     activity = models.ForeignKey(activity, on_delete=models.CASCADE, null=True, blank=True)
     ATTRACTION_TYPE = [
         ('1', 'Low'),
@@ -60,9 +56,10 @@ class PreReservation(models.Model):
         ('4', 'Thrilling'),
     ]
     attraction_type = models.CharField(max_length=20, choices=ATTRACTION_TYPE, null=False)
+    seats = models.PositiveIntegerField(blank=False, null=False, default=100)
 
     def __str__(self):
-        return str(self.activity) + ' || ' + str(self.start_date) + ' - ' + str(self.end_date)
+        return str(self.activity) + ' || ' + str(self.date)
 
 
 class Visitor(models.Model):
@@ -91,12 +88,3 @@ class Feedback(models.Model):
     def __str__(self):
         return self.feedbackID
 
-
-class WaitingOn(models.Model):
-    resID = models.ForeignKey('Reservation', on_delete=models.CASCADE, null=False, blank=False)
-    date_booked = models.DateField(default=timezone.now, null=False)
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
-
-    class Meta:
-        verbose_name_plural = 'WaitingOn'

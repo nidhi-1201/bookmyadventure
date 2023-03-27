@@ -1,54 +1,89 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  
-  <title>BookMyAdventure</title></head>
-
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  
+  <title>Welcome - Adventure Booking</title></head>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
 </head>
 
 <body>
+
+    <!-- NavBar -->
+  {% include 'partials/_navbar_base.html' %}
   <!-- Top Bar -->
   {% include 'partials/_topbar_base.html' %}
-  <!-- NavBar -->
-  {% include 'partials/_navbar_base.html' %}
+
     <!-- Main Content -->
-  {% block content %} {% endblock %}
-  
-
-            <section class="section-tours" id="section-tours">
-                <div class="u-center-text u-margin-bottom-big">
-                    <h2 class="heading-secondary">
-                        Rides & Experiences
-                    </h2>
-                </div>
-
-                <div class="row">
-                    <div class="col-1-of-3">
-                       <div class="card">
-                           <div class="card__side card__side--front">
-                                <h4 class="card__heading">
-                                    <span class="card__heading-span card__heading-span--1">Canada’s Wonderland has something for every guest, from the big thrills of its 18 roller coasters like Yukon Striker, Leviathan and Behemoth to the little thrills of Planet Snoopy and KidZville!
-                                        <b>If you prefer to slide, dive into Splash Works water park. The 20-acre sun lover's paradise features a wave pool, water slides, children’s splash stations, cliff jumping at Mountain Bay Cliffs and so much more!</span>
+  {% block content %}
+        <div class="container u-margin-bottom-big">
+            <div class="text-center u-margin-top-big mb-5">
+                <h2 class="display-3 heading__activities">
+                    Our Activities
+                </h2>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-4 d-flex text-center">
+                   <div class="card">
+                       <div class="card-body card__picture">
+                           <div class="card__side">
+                               <h4 class="card__heading">
+                                    <span class="card__heading-span">The Blue Mountain Resort</span>
                                 </h4>
-                           </div>
-                        </div>
-                    </div>
+                                <div class="card__details">
+                                    <ul>
+                                        <li>Activity : Hike and Tube</li>
+                                        <li>Location: Blue Mountain</li>
+                                    </ul>
+                                </div>
+                            </div>
+                       </div>
+                   </div>
                 </div>
-              </section>
-
-
-                    </main>
-
-   <!-- Footer -->
+                <div class="col-md-4 mb-4 d-flex text-center">
+                   <div class="card">
+                       <div class="card-body card__picture">
+                           <div class="card__side">
+                               <h4 class="card__heading">
+                                    <span class="card__heading-span">The Blue Mountain Resort</span>
+                                </h4>
+                                <div class="card__details">
+                                    <ul>
+                                        <li>Activity : Snow Shoeing</li>
+                                        <li>Location: Blue Mountain</li>
+                                    </ul>
+                                </div>
+                            </div>
+                       </div>
+                   </div>
+                </div>
+                <div class="col-md-4 mb-4 d-flex text-center">
+                   <div class="card">
+                       <div class="card-body card__picture">
+                           <div class="card__side">
+                               <h4 class="card__heading">
+                                    <span class="card__heading-span">The Blue Mountain Resort</span>
+                                </h4>
+                                <div class="card__details">
+                                    <ul>
+                                        <li>Activity : Ridge Runner Mountain Coaster</li>
+                                        <li>Location: Blue Mountain</li>
+                                    </ul>
+                                </div>
+                            </div>
+                       </div>
+                   </div>
+                </div>
+             </div>
+        </div>
+  {% endblock %}
+  <!-- Footer -->
   {% include 'partials/_footer_base.html' %}
-  
-
     </body>
 </html>

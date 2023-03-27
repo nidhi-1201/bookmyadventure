@@ -5,28 +5,24 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.db.models import Q
+from django.contrib.auth.forms import AuthenticationForm
+import datetime
+from django.views import View
 
-from django.db.models import Count
 from .forms import *
 from .models import *
-import datetime
 
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
 
 from django.contrib.auth.models import Group
 
 
-# The major backend logic for online guest house booking system
-
 # Function to display the Homepage of the web system
-def home(request):
-    return render(request=request, template_name="user/home.html")
+class home(View):
+    def get(self, request):
+        return render(request=request, template_name="user/home.html")
 
 
-# Function to Sign up new user
+
 def sign_up(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
@@ -36,7 +32,6 @@ def sign_up(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            messages.info(request, "Welcome to KGP")
             return redirect('index')
         else:
             messages.error(request, "Invalid Form Details")
@@ -45,7 +40,7 @@ def sign_up(request):
     return render(request, 'user/sign-up.html', {'form': form})
 
 
-# Fuction to edit User details
+# Function for editing user details
 def edit_user(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -75,7 +70,7 @@ def edit_user(request):
     return render(request, 'user/user-edit.html', {'form': form})
 
 
-# Function to Login in a new user
+# Function for signing user in
 def login_request(request):  # request variable takes a GET or POST HTTP request
     if request.method == 'POST':
         form = AuthenticationForm(request=request, data=request.POST)
@@ -89,7 +84,6 @@ def login_request(request):  # request variable takes a GET or POST HTTP request
                 return redirect('login')
 
             if user is not None:
-                # Checking if a user if a staff
                 if user.is_staff and not user.groups.filter(name='Staff').exists():
                     group = Group.objects.get(name='Staff')
                     user.groups.add(group)
@@ -104,29 +98,95 @@ def login_request(request):  # request variable takes a GET or POST HTTP request
     return render(request, "user/login.html", context={"form": form})
 
 
-# Function to logout the user
+# Function for logouut
 def logout_request(request):  # request variable takes a GET or POST HTTP request
     logout(request)
     messages.info(request, "Logged out successfully!")
     return redirect('home')
 
 
-# Function to change the password of the user
-def change_password(request):  # request variable takes a GET or POST HTTP request
+class index(View):
+    def get(self, request):  # request variable takes a GET or POST HTTP request
+        user = request.user
+        if user.username and user.is_staff is False and user.is_superuser is False:
+            form = ReservationForm(request.POST)
+            return render(request, "user/index.html", {'form': form})
+        else:
+            messages.warning(request, 'You are not logged in. Please login')
+            return redirect('home')
+
+    def post(self, request):
+        user = request.user
+        if user.username and user.is_staff is False and user.is_superuser is False:
+            form = ReservationForm(request.POST)
+            if form.is_valid():
+                date = form.cleaned_data['date']
+                if date < datetime.date.today():
+                    messages.warning(request, 'Please Enter Proper dates')
+                    return redirect('index')
+                return redirect('book', date)
+            else:
+                for e in form.errors:
+                    messages.error(request, e)
+                return redirect('index')
+        else:
+            messages.warning(request, 'You are not logged in. Please login')
+            return redirect('home')
+
+
+# Function for cancelling reserved activity
+def cancel(request, id):  # request variable takes a GET or POST HTTP request
+    user = request.user
+    if user.username and user.is_staff is False and user.is_superuser is False:
+
+        reservation = Reservation.objects.get(id=id)
+        p = PreReservation.objects.get(date=reservation.date, activity_id=reservation.activity_allocated.id)
+        p.seats = p.seats + 1
+        p.save()
+        reservation.status = False
+        reservation.save()
+
+
+        messages.warning(request, 'Your Booking with Booking number  ' + str(
+            reservation.bookingID) + ' is cancelled Succesfully')
+        return render(request, "booking/cancel_successful.html", {'reservation': reservation})
+    else:
+        messages.warning(request, 'you are not logged in or have no access')
+        return redirect('login')
+
+
+def book(request, date):  # request variable takes a GET or POST HTTP request
     user = request.user
     if user.username and user.is_staff is False and user.is_superuser is False:
         if request.method == 'POST':
-            form = PasswordChangeForm(request.user, request.POST)
-            if form.is_valid():  # here user details are verified from database
-                user = form.save()
-                update_session_auth_hash(request.user)
-                messages.success(request, 'Your password was successfully updated!')
-                return redirect('change_password')
-            else:
-                messages.error(request, 'Please correct the error below:')
+            return redirect('index')
         else:
-            form = PasswordChangeForm(request.user)
-        return render(request, 'user/change_password.html', {'form': form})
+            try:
+                T = PreReservation.objects.filter(date=date)
+            except PreReservation.DoesNotExist:
+                T = PreReservation.objects.create(date=date)
+
+            if not T:
+                activity_available = activity.objects.all()
+                for a in activity_available:
+                    a.prereservation_set.create(date=date)
+
+            activities = PreReservation.objects.filter(date=date)
+        return render(request, 'booking/available.html', {'activities': activities})
     else:
         messages.warning(request, 'You are not logged in. Please login')
-        return redirect('home')
+        redirect('home')
+
+
+def activitydetails(request, id):  # request variable takes a GET or POST HTTP request
+    user = request.user
+    if user.username and user.is_staff is False and user.is_superuser is False:
+        if request.method == 'POST':
+            a = activity.objects.get(pk = id)
+            return render(request, "booking/activitydetails.html", {'activity': a})
+        else:
+            messages.warning(request, 'something went wrong')
+            return redirect('index')
+    else:
+        messages.warning(request, 'you are not logged in or have no access')
+        return redirect('login')

@@ -1,55 +1,45 @@
-
-{% extends 'base.html' %} 
-
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %} | About Us {% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<body>
 
-{% block content %}
-
-<br><br>
-                <div class="row">
-                    <div class="book">
-                        <div class="book__form">
-                            
-                                <div class="u-margin-bottom-medium">
-                                    <h2 class="heading-secondary">
-                                        UPDATE
-                                    </h2>
-                                </div>
-                                
-                                <form method="post" class="form" >
-    
+  {% block content %}
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12 mb-5 mt-5">
+                        <div class="book book__form p-5">
+                            <h2 class="login--title mb-4">Update your profile</h2>
+                            <form method="post" class="form" >
                                 {% csrf_token %}
-
-                                <h2 class= "heading-tertiary">First Name</h2><br>
-                                <h2 style='color:red'class= "heading-tertiary">
-                                    {{form.first_name.errors}}</h2>
-                                
-                                {{form.first_name}}
-                                <br>
-
-                                <h2 class= "heading-tertiary">Last Name</h2><br>
-                                <h2 style='color:red'class= "heading-tertiary">
-                                    {{form.last_name.errors}}</h2>
-
-                                {{form.last_name}}
-                                <br>
-
-                                <h2 class= "heading-tertiary">Email</h2><br>
-                                <h2 style='color:red'class= "heading-tertiary">
-                                    {{form.email.errors}}</h2>
-
-                                {{form.email}}
-                            
-                                <div class="form__group">
-                                <br><br>
-                                    <button class="btn btn--green" type="submit">Update &rarr;</button>
+                                <div class="row">
+                                    <div class = "col-sm-4">
+                                        <label class= "form__label mb-4">Email</label>
+                                        <h2 style='color:red' class= "heading-tertiary">{{form.email.errors}}</h2>
+                                         {{form.email}}
+                                    </div>
+                                    <div class = "col-sm-4">
+                                         <label class= "form__label mb-4">First Name</label>
+                                        <h2 style='color:red' class= "heading-tertiary">{{form.first_name.errors}}</h2>
+                                         {{form.first_name}}
+                                    </div>
+                                    <div class = "col-sm-4">
+                                        <label class= "form__label mb-4">Last Name</label>
+                                        <h2 style='color:red' class= "heading-tertiary">{{form.last_name.errors}}</h2>
+                                         {{form.last_name}}
+                                    </div>
                                 </div>
-                        </form>
-                        </div>
+                                <div class="form__group mt-5">
+                                    <button class="btn btn-primary" type="submit">Update &rarr;</button>
+                                </div>
+
+                            </form>
+                         </div>
+                    </div>
                     </div>
                 </div>
-
-
 {% endblock %}
+    </body>
+</html>
+
