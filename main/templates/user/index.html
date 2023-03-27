@@ -1,0 +1,31 @@
+
+{% extends 'base.html' %}
+
+{% load static %}
+    <!-- NavBar -->
+
+
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class = "col-md-4 offset-md-4 mb-5 mt-5">
+                <div class="book book__form p-5">
+                <h2 class = "login--title mb-4 text-center">Search Activities</h2>
+                <div class = "pt-3">
+                   <form method="post" action="{% url 'index' %}" id="options_form">
+                        <h2 class= "form__label mb-4">Date</h2>
+                        {{ form.date }}
+
+                        {% csrf_token %}
+                        <div class="form-group mt-5 text-center">
+                            <button class="btn btn-primary" type="submit">Search &rarr;</button>
+                        </div>
+                   </form>
+              </div>
+                    </div>
+          </div>
+        </div>
+    </div>
+{% endblock %}
+{% include 'partials/_footer_base.html' %}

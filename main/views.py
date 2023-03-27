@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
-
+import datetime
 from django.views import View
 
 from .forms import *
@@ -103,3 +103,53 @@ def logout_request(request):  # request variable takes a GET or POST HTTP reques
     logout(request)
     messages.info(request, "Logged out successfully!")
     return redirect('home')
+
+
+class index(View):
+    def get(self, request):  # request variable takes a GET or POST HTTP request
+        user = request.user
+        if user.username and user.is_staff is False and user.is_superuser is False:
+            form = ReservationForm(request.POST)
+            return render(request, "user/index.html", {'form': form})
+        else:
+            messages.warning(request, 'You are not logged in. Please login')
+            return redirect('home')
+
+    def post(self, request):
+        user = request.user
+        if user.username and user.is_staff is False and user.is_superuser is False:
+            form = ReservationForm(request.POST)
+            if form.is_valid():
+                date = form.cleaned_data['date']
+                if date < datetime.date.today():
+                    messages.warning(request, 'Please Enter Proper dates')
+                    return redirect('index')
+                return redirect('book', date)
+            else:
+                for e in form.errors:
+                    messages.error(request, e)
+                return redirect('index')
+        else:
+            messages.warning(request, 'You are not logged in. Please login')
+            return redirect('home')
+
+
+# Function for cancelling reserved activity
+def cancel(request, id):  # request variable takes a GET or POST HTTP request
+    user = request.user
+    if user.username and user.is_staff is False and user.is_superuser is False:
+
+        reservation = Reservation.objects.get(id=id)
+        p = PreReservation.objects.get(date=reservation.date, activity_id=reservation.activity_allocated.id)
+        p.seats = p.seats + 1
+        p.save()
+        reservation.status = False
+        reservation.save()
+
+
+        messages.warning(request, 'Your Booking with Booking number  ' + str(
+            reservation.bookingID) + ' is cancelled Succesfully')
+        return render(request, "booking/cancel_successful.html", {'reservation': reservation})
+    else:
+        messages.warning(request, 'you are not logged in or have no access')
+        return redirect('login')
