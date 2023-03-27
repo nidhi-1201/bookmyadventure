@@ -65,3 +65,10 @@ class ReservationForm(forms.Form):
         attrs={'type': 'date',
         "class": "form__input",
         }), required=True,)
+
+class FeedbackForm(forms.ModelForm):
+    feed = forms.CharField(widget=forms.Textarea(attrs={"class": "form__input", "placeholder": "Write Here", }))
+    class Meta:
+        model = Feedback
+        fields = ['feed']
+

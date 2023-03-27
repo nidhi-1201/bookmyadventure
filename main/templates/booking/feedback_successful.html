@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row mt-5 mb-5">
+        <div class="col-md-8">
+             <p class="heading__activities mb-4">Thank You !</p>
+            <h2 class="heading-tertiary">Thank You for your Feedback</h2>
+            <button class="btn btn-primary mt-5" onclick="location.href='/profile'">Back to Home Page</button>
+         </div>
+        <div class="col-md-4 d-flex align-items-center justify-content-center">
+            <div class="book book__form p-5">
+                <h2 class="login--title">USER INFO</h2>
+                <p class="text-white profile--info--details mt-5">Username: {{user.username}}</p>
+                <p class="text-white profile--info--details mt-3">Name: {{user.first_name}}  {{user.last_name}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
